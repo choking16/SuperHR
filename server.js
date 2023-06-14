@@ -14,7 +14,8 @@ const session = require("express-session")
 
 initializePassport(
     passport,
-    email => users.find(user => user.email === email)
+    email => users.find(user => user.email === email),
+    id => users.find(user => user.id === id)
     )
 
 const users = []
@@ -30,7 +31,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 //config
-app.post("/login", passport.authenticate("local",{
+app.post("/login", checkAuthenticated, passport.authenticate("local",{
     successRedirect: "/",
     failureRedirect: "/login",
     failureFlash: true
@@ -38,9 +39,9 @@ app.post("/login", passport.authenticate("local",{
 
 
 //Config register post function
-app.post("/register", async(req, res) =>{
+app.post("/register",checkAuthenticated, async(req, res) =>{
     try{
-        const hashedPassword = await bcryp.hash(req.body.password, 10)
+        const hashedPassword = await bcrypt.hash(req.body.password, 10)
         users.push({
             id: Date.now().toString(),
             name: req.body.name,
@@ -57,22 +58,33 @@ app.post("/register", async(req, res) =>{
 })
 
 //routes
-app.get('/home-page', (req, res)=>{
-    res.render("index.ejs")
+app.get('/', checkAuthenticated, (req, res)=>{
+    res.render("index.ejs", {name: req.user.name})
 })
 
-app.get('/login', (req, res)=>{
+app.get('/login',checkAuthenticated, (req, res)=>{
     res.render("login.ejs")
 })
 
-app.get('/register', (req, res)=>{
+app.get('/register',checkAuthenticated, (req, res)=>{
     res.render("register.ejs")
 })
 
-app.get('/forgotpassword', (req, res)=>{
-    res.render("forgotpassword.ejs")
-})
 
 //end routes
 
-app.listen(3030)
+function checkAuthenticated(req, res, next){
+    if(req.isAuthenticated()){
+        return next()
+    }
+    res.redirect("/login")
+}
+
+function checkNotAuthenticated(req, res, next){
+    if(req.isAuthenticated()){
+        res.redirect("/login")
+    }
+    next()
+}
+
+app.listen(8000)

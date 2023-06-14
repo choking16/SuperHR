@@ -3,6 +3,10 @@
 <head>
   <title>Login Page</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+  <body>
+    <h1> </h1>
+    <img src="views\logo.jpg" alt="logo">
+</body>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -10,7 +14,7 @@
     }
 
     .container {
-      width: 300px;
+      width: 400px;
       margin: 0 auto;
       margin-top: 100px;
       background-color: #ffffff;
@@ -24,7 +28,7 @@
       margin-bottom: 20px;
     }
 
-    .container input[type="text"],
+    .container input[type="email"],
     .container input[type="password"] {
       width: 100%;
       padding: 10px;
@@ -61,8 +65,14 @@
 <body>
   <div class="container">
     <h2>Login</h2>
+    <form action="/login" method="POST"></form>
     <form>
-      <input type="text" name="username" placeholder="Username" required>
+      <% if (messages.error) {%>
+        <div class="alert alert-danger">
+          <strong><%= messages.error; %></strong>
+        </div>
+        <% } %>
+      <input type="email" name="email" placeholder="Email Address" required>
       <input type="password" name="password" placeholder="Password" required>
       <input type="submit" value="Login">
       <div class="links">
